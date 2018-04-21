@@ -114,7 +114,7 @@ static id _ucsIPCCDelegate =nil; //代理对象，用于回调
  @param transport 连接方式
 
  */
-- (BOOL)addProxyConfig:(NSString*)username password:(NSString*)password displayName:(NSString *)displayName domain:(NSString*)domain port:(NSString *)port withTransport:(NSString*)transport {
+- (BOOL)addProxyConfig:(NSString*)username password:(NSString*)password displayName:(NSString *)displayName domain:(NSString*)domain proxy:(NSString *)proxy withTransport:(NSString*)transport {
     LinphoneCore* lc = [LinphoneManager getLc];
     
     if (lc == nil) {
@@ -123,7 +123,7 @@ static id _ucsIPCCDelegate =nil; //代理对象，用于回调
     }
     
     LinphoneProxyConfig* proxyCfg = linphone_core_create_proxy_config(lc);
-    NSString* server_address = domain;
+    
     
     char normalizedUserName[256];
     linphone_proxy_config_normalize_number(proxyCfg, [username cStringUsingEncoding:[NSString defaultCStringEncoding]], normalizedUserName, sizeof(normalizedUserName));
@@ -136,9 +136,10 @@ static id _ucsIPCCDelegate =nil; //代理对象，用于回调
     if (displayName && displayName.length != 0) {
         linphone_address_set_display_name(linphoneAddress, (displayName.length ? displayName.UTF8String : NULL));
     }
+    NSString* server_address = proxy;
     if( domain && [domain length] != 0) {
         if( transport != nil ){
-            server_address = [NSString stringWithFormat:@"%@:%@;transport=%@", server_address, port, [transport lowercaseString]];
+            server_address = [NSString stringWithFormat:@"%@;transport=%@", server_address, [transport lowercaseString]];
         }
         // when the domain is specified (for external login), take it as the server address
         linphone_proxy_config_set_server_addr(proxyCfg, [server_address UTF8String]);
@@ -149,25 +150,25 @@ static id _ucsIPCCDelegate =nil; //代理对象，用于回调
     // 添加了昵称后的identity
     identity = linphone_address_as_string(linphoneAddress);
     
-//    char* extractedAddres = linphone_address_as_string_uri_only(linphoneAddress);
+    //    char* extractedAddres = linphone_address_as_string_uri_only(linphoneAddress);
     linphone_address_destroy(linphoneAddress);
-//    LinphoneAddress* parsedAddress = linphone_address_new(extractedAddres);
-//    ms_free(extractedAddres); // 释放
+    //    LinphoneAddress* parsedAddress = linphone_address_new(extractedAddres);
+    //    ms_free(extractedAddres); // 释放
     
-//    if( parsedAddress == NULL || !linphone_address_is_sip(parsedAddress) ){
-//        if( parsedAddress ) linphone_address_destroy(parsedAddress);
-//        UIAlertView* errorView = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Check error(s)",nil)
-//                                                            message:NSLocalizedString(@"Please enter a valid username", nil)
-//                                                           delegate:nil
-//                                                  cancelButtonTitle:NSLocalizedString(@"Continue",nil)
-//                                                  otherButtonTitles:nil,nil];
-//        [errorView show];
-//        return FALSE;
-//    }
-//    
-//    char *c_parsedAddress = linphone_address_as_string_uri_only(parsedAddress);
-////    linphone_proxy_config_set_identity(proxyCfg, c_parsedAddress);
-//    linphone_address_destroy(parsedAddress);
+    //    if( parsedAddress == NULL || !linphone_address_is_sip(parsedAddress) ){
+    //        if( parsedAddress ) linphone_address_destroy(parsedAddress);
+    //        UIAlertView* errorView = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Check error(s)",nil)
+    //                                                            message:NSLocalizedString(@"Please enter a valid username", nil)
+    //                                                           delegate:nil
+    //                                                  cancelButtonTitle:NSLocalizedString(@"Continue",nil)
+    //                                                  otherButtonTitles:nil,nil];
+    //        [errorView show];
+    //        return FALSE;
+    //    }
+    //
+    //    char *c_parsedAddress = linphone_address_as_string_uri_only(parsedAddress);
+    ////    linphone_proxy_config_set_identity(proxyCfg, c_parsedAddress);
+    //    linphone_address_destroy(parsedAddress);
     LinphoneAuthInfo* info = linphone_auth_info_new([username UTF8String]
                                                     , NULL, [password UTF8String]
                                                     , NULL
@@ -178,19 +179,22 @@ static id _ucsIPCCDelegate =nil; //代理对象，用于回调
     
     [self clearProxyConfig];
     
-//    linphone_core_clear_all_auth_info(lc);
+    //    linphone_core_clear_all_auth_info(lc);
     linphone_proxy_config_set_identity(proxyCfg, identity);
     linphone_proxy_config_set_expires(proxyCfg, 2000);
     linphone_proxy_config_enable_register(proxyCfg, true);
     linphone_core_add_auth_info(lc, info);
     linphone_core_add_proxy_config(lc, proxyCfg);
     linphone_core_set_default_proxy_config(lc, proxyCfg);
+    
+    //配置路由信息
+    const char *route = [[NSString stringWithFormat:@"sip:%@;transport=%@",proxy,[transport lowercaseString]] UTF8String];
+    linphone_proxy_config_set_route(proxyCfg, route);
+    
     ms_free(identity);
-
     
-    [UCSIPCCSDKLog saveDemoLogInfo:@"登陆信息配置成功" withDetail:[NSString stringWithFormat:@"username:%@,\npassword:%@,\ndisplayName:%@\ndomain:%@,\nport:%@\ntransport:%@", username, password, displayName, domain, port, transport]];
     
-
+    [UCSIPCCSDKLog saveDemoLogInfo:@"登陆信息配置成功" withDetail:[NSString stringWithFormat:@"username:%@,\npassword:%@,\ndisplayName:%@\ndomain:%@,\nproxy:%@\ntransport:%@", username, password, displayName, domain, proxy, transport]];
     
     return TRUE;
 }
@@ -249,13 +253,13 @@ static id _ucsIPCCDelegate =nil; //代理对象，用于回调
  */
 - (void)call:(NSString *)address displayName:(NSString*)displayName transfer:(BOOL)transfer {
     // 号码有效性判断
-    if (![self checkPhoneNumInput:address]) {
-        
-        [UCSIPCCSDKLog saveDemoLogInfo:@"请输入正确的号码" withDetail:[NSString stringWithFormat:@"address:%@,\ndisplayName:%@", address, displayName]];
-        NSDictionary *dic = [NSDictionary dictionaryWithObject:@"号码错误，请输入正确的号码" forKey:@"message"];
-        [self.delegate onDialFailed:UCSCallNumberError withMessage:dic];
-        return;
-    }
+//    if (![self checkPhoneNumInput:address]) {
+//        
+//        [UCSIPCCSDKLog saveDemoLogInfo:@"请输入正确的号码" withDetail:[NSString stringWithFormat:@"address:%@,\ndisplayName:%@", address, displayName]];
+//        NSDictionary *dic = [NSDictionary dictionaryWithObject:@"号码错误，请输入正确的号码" forKey:@"message"];
+//        [self.delegate onDialFailed:UCSCallNumberError withMessage:dic];
+//        return;
+//    }
     
     [[LinphoneManager instance] call:address displayName:displayName transfer:transfer];
     [UCSIPCCSDKLog saveDemoLogInfo:@"拨打电话操作" withDetail:[NSString stringWithFormat:@"address:%@,\ndisplayName:%@", address, displayName]];

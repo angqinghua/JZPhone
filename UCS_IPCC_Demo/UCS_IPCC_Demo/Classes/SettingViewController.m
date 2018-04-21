@@ -98,7 +98,7 @@ static NSTimer *timer;
     [UCSUserDefaultManager SetLocalDataString:self.text_displayName.text key:@"login_displayName"];
     NSString *transport = [UCSUserDefaultManager GetLocalDataString:@"login_transport"];
     
-    [[UCSIPCCManager instance] addProxyConfig:self.text_userName.text password:self.text_password.text displayName:self.text_displayName.text domain:self.text_domain.text port:self.text_port.text withTransport:transport];
+    [[UCSIPCCManager instance] addProxyConfig:self.text_userName.text password:self.text_password.text displayName:self.text_displayName.text domain:self.text_domain.text proxy:self.text_port.text withTransport:transport];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:@"addConfigSucceed" object:nil];
     

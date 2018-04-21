@@ -33,7 +33,7 @@
 /**
  设置登陆信息
  */
-- (BOOL)addProxyConfig:(NSString*)username password:(NSString*)password displayName:(NSString *)displayName domain:(NSString*)domain port:(NSString *)port withTransport:(NSString*)transport;
+- (BOOL)addProxyConfig:(NSString*)username password:(NSString*)password displayName:(NSString *)displayName domain:(NSString*)domain proxy:(NSString *)proxy withTransport:(NSString*)transport;
 
 
 /**
