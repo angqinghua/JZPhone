@@ -91,15 +91,26 @@ static id _ucsIPCCDelegate =nil; //代理对象，用于回调
 /**
  @author Jozo, 16-06-30 11:06:18
  
+
+
  初始化
  */
-- (void)startUCSphone {
+- (void)startUCSphone{
     
     [[LinphoneManager instance] startLibLinphone];
     [UCSIPCCSDKLog saveDemoLogInfo:@"初始化成功" withDetail:nil];
     
 }
 
+/**
+ log显示等级
+ 
+ */
+- (void)set_log_level:(int)level{
+    
+    [UCSIPCCSDKLog set_log_level:level];
+
+}
 
 /**
  @author Jozo, 16-06-30 11:06:13
@@ -261,6 +272,7 @@ static id _ucsIPCCDelegate =nil; //代理对象，用于回调
 //        return;
 //    }
     
+    NSLog(@"%@..........",address);
     [[LinphoneManager instance] call:address displayName:displayName transfer:transfer];
     [UCSIPCCSDKLog saveDemoLogInfo:@"拨打电话操作" withDetail:[NSString stringWithFormat:@"address:%@,\ndisplayName:%@", address, displayName]];
 }

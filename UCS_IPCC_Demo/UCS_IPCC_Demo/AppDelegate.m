@@ -57,6 +57,8 @@
     
     [[UCSIPCCManager instance] startUCSphone];
     
+    [[UCSIPCCManager instance] set_log_level:CLOSE_LOG];
+    
     [[UCSIPCCManager instance] setDelegate:self];
     
     NSString *name = [UCSUserDefaultManager GetLocalDataString:@"login_user_name"];

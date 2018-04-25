@@ -10,6 +10,11 @@
 #import "UCSIPCCDelegate.h"
 #import "UCSIPCCClass.h"
 
+#define CLOSE_LOG           0
+#define SHOW_ON_CONSOLE     1
+#define SAVE_TO_FILE        2
+#define SAVE_AND_SHOW       3
+
 @interface UCSIPCCManager : NSObject<UCSIPCCDelegate>
 
 @property (nonatomic, readwrite, assign) id<UCSIPCCDelegate> delegate;      // 回调代理
@@ -26,9 +31,16 @@
 
 /**
  初始化
+ 
  */
--(void)startUCSphone;
+- (void)startUCSphone;
 
+
+/**
+ log显示等级
+
+ */
+- (void)set_log_level:(int)level;
 
 /**
  设置登陆信息

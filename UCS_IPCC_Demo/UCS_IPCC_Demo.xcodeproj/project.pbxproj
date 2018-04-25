@@ -1090,7 +1090,6 @@
 		ABB900381D2386EB00ED431E /* UCS_IPCC_Demo */ = {
 			isa = PBXGroup;
 			children = (
-				ABB9009D1D23883100ED431E /* Frameworks */,
 				ABB9003C1D2386EB00ED431E /* AppDelegate.h */,
 				ABB9003D1D2386EB00ED431E /* AppDelegate.m */,
 				ABBBE75E1D24FAB200F9D3F4 /* Classes */,
@@ -1100,6 +1099,7 @@
 				ABB900471D2386EB00ED431E /* LaunchScreen.storyboard */,
 				ABB9004A1D2386EB00ED431E /* Info.plist */,
 				ABB900FA1D23914A00ED431E /* IPCC_SDK */,
+				ABB9009D1D23883100ED431E /* Frameworks */,
 				ABB900391D2386EB00ED431E /* Supporting Files */,
 			);
 			path = UCS_IPCC_Demo;

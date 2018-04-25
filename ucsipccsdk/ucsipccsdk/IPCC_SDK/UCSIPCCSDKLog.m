@@ -8,6 +8,8 @@
 
 #import "UCSIPCCSDKLog.h"
 
+static int log_level = CLOSE_LOG;
+
 @implementation UCSIPCCSDKLog
 
 
@@ -35,7 +37,9 @@
         strDetail = [[NSString alloc] initWithString:@""];
     }
     
-    [UCSIPCCSDKLog demologc_Write:strSummary andStrDetail:strDetail];
+    if (log_level > CLOSE_LOG) {
+        [UCSIPCCSDKLog demologc_Write:strSummary andStrDetail:strDetail];
+    }
     
 }
 
@@ -52,22 +56,22 @@
     [formatter release];
     
     NSString *url = [NSString stringWithFormat:@"\n\n=============sdk日志=============时间:%@\nSummary:\n%@\n\nstrDetail:\n%@\n\n",timeString,strSummary,strDetail];
-    NSString *path = demo_applicationDocumentsDirectory();// stringByAppendingPathComponent:@"Exception.txt"];
     
-    NSLog(@"%@",url);
+    if (log_level != SAVE_TO_FILE) {
+        NSLog(@"%@",url);
+    }
     
-    //一次性读写
-    //    [url writeToFile:path atomically:YES encoding:(NSUTF8StringEncoding) error:nil];
-    
-    
-    NSFileHandle *outFile = [NSFileHandle fileHandleForWritingAtPath:path];
-    //找到并定位到outFile的末尾位置(在此后追加文件)
-    [outFile seekToEndOfFile];
-    
-    [outFile writeData:[url dataUsingEncoding:NSUTF8StringEncoding]];
-    //关闭读写文件
-    [outFile closeFile];
-    
+    if (log_level > SHOW_ON_CONSOLE) {
+        NSString *path = demo_applicationDocumentsDirectory();
+        
+        NSFileHandle *outFile = [NSFileHandle fileHandleForWritingAtPath:path];
+        //找到并定位到outFile的末尾位置(在此后追加文件)
+        [outFile seekToEndOfFile];
+        
+        [outFile writeData:[url dataUsingEncoding:NSUTF8StringEncoding]];
+        //关闭读写文件
+        [outFile closeFile];
+    }
     
 }
 //日志存放路径
@@ -122,6 +126,8 @@ NSString *demo_applicationDocumentsDirectory()
     return [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
 }
 
-
++ (void) set_log_level:(int)level{
+    log_level = level;
+}
 
 @end
