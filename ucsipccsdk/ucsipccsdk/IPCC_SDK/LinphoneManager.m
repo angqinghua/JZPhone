@@ -1358,14 +1358,14 @@ static LinphoneCoreVTable linphonec_vtable = {
 	linphone_core_set_play_file(theLinphoneCore, lPlay);
 
 	linphone_core_set_zrtp_secrets_file(theLinphoneCore, [zrtpSecretsFileName cStringUsingEncoding:[NSString defaultCStringEncoding]]);
-	linphone_core_set_chat_database_path(theLinphoneCore, [chatDBFileName cStringUsingEncoding:[NSString defaultCStringEncoding]]);
-
-	// we need to proceed to the migration *after* the chat database was opened, so that we know it is in consistent state
-	BOOL migrated = [self migrateChatDBIfNeeded:theLinphoneCore];
-	if( migrated ){
-		// if a migration was performed, we should reinitialize the chat database
-		linphone_core_set_chat_database_path(theLinphoneCore, [chatDBFileName cStringUsingEncoding:[NSString defaultCStringEncoding]]);
-	}
+//    linphone_core_set_chat_database_path(theLinphoneCore, [chatDBFileName cStringUsingEncoding:[NSString defaultCStringEncoding]]);
+//
+//    // we need to proceed to the migration *after* the chat database was opened, so that we know it is in consistent state
+//    BOOL migrated = [self migrateChatDBIfNeeded:theLinphoneCore];
+//    if( migrated ){
+//        // if a migration was performed, we should reinitialize the chat database
+//        linphone_core_set_chat_database_path(theLinphoneCore, [chatDBFileName cStringUsingEncoding:[NSString defaultCStringEncoding]]);
+//    }
 
 	/* AVPF migration */
 	if( [self lpConfigBoolForKey:@"avpf_migration_done" forSection:@"app"] == FALSE ){

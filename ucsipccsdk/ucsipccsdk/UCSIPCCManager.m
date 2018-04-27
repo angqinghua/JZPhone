@@ -272,7 +272,6 @@ static id _ucsIPCCDelegate =nil; //代理对象，用于回调
 //        return;
 //    }
     
-    NSLog(@"%@..........",address);
     [[LinphoneManager instance] call:address displayName:displayName transfer:transfer];
     [UCSIPCCSDKLog saveDemoLogInfo:@"拨打电话操作" withDetail:[NSString stringWithFormat:@"address:%@,\ndisplayName:%@", address, displayName]];
 }
